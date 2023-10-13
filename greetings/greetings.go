@@ -5,7 +5,7 @@ import (
     "fmt"
 )
 
-// Hello returns a greeting for the named person.
+// Hello returns a greeting for the named person
 func Hello(name string) (string, error) {
     // If no name was given, return an error with a message.
     if name == "" {
