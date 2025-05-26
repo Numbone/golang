@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-export func GoRoutine() {
+func main() {
 	go func() {
 		time.Sleep(time.Second)
 		fmt.Println("Concurrently ninja with delay")
