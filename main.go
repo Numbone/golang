@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -35,10 +36,16 @@ func (u User) getActivityInfo() string {
 }
 
 func main() {
+	t := time.Now()
 	users := generateUser(1000)
+	wg := &sync.WaitGroup{}
 	for _, user := range users {
-		saveUserInfo(user)
+		wg.Add(1)
+		go saveUserInfo(user, wg)
 	}
+	wg.Wait()
+
+	fmt.Println("TIME ELAPSED:", time.Since(t).String())
 }
 
 func generateUser(count int) []User {
@@ -61,7 +68,7 @@ func generateLogs(count int) []logItem {
 	return logs
 }
 
-func saveUserInfo(user User) error {
+func saveUserInfo(user User, wg *sync.WaitGroup) error {
 	fmt.Printf("WRITING FILE FOR USER ID: %d\n", user.id)
 	filename := fmt.Sprintf("logs/user%d.txt", user.id)
 	file, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0664)
@@ -69,5 +76,9 @@ func saveUserInfo(user User) error {
 		return err
 	}
 	_, err = file.WriteString(user.getActivityInfo())
+	if err != nil {
+		return err
+	}
+	wg.Done()
 	return err
 }
