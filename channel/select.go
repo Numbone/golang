@@ -1,11 +1,11 @@
-package main
+package channel
 
 import (
 	"fmt"
 	"time"
 )
 
-func main() {
+func selectel() {
 	message1 := make(chan string)
 	message2 := make(chan string)
 
