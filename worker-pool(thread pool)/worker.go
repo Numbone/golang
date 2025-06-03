@@ -1,11 +1,11 @@
-package main
+package worker_pool_thread_pool_
 
 import (
 	"fmt"
 	"time"
 )
 
-func main() {
+func worker_pool() {
 	t := time.Now()
 	const jobsCount, workerCount = 15, 15
 	jobs := make(chan int, jobsCount)
