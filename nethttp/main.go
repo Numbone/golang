@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/cookiejar"
 	"os"
 	"time"
 )
@@ -20,6 +21,14 @@ func (rt *loggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 }
 
 func main() {
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		panic(err)
+	}
+	//jar.SetCookies(url.URL{
+	//	Host: "",
+	//
+	//}("http://localhost:8000"),[]*http.Cookie{})
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			fmt.Println(req.Response.StatusCode)
@@ -30,6 +39,7 @@ func main() {
 			logger: os.Stdout,
 			next:   http.DefaultTransport,
 		},
+		Jar: jar,
 	}
 	resp, err := client.Get("https://www.google.com")
 	if err != nil {
