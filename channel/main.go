@@ -2,7 +2,7 @@ package channel
 
 import "fmt"
 
-func channelBuffer() {
+func main() {
 	msg := make(chan string, 3) // buffer -->deadlock
 
 	msg <- "channel"
