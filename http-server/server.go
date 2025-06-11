@@ -1,6 +1,7 @@
 package http_server
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -22,10 +23,35 @@ var users = []User{
 	},
 }
 
-func server() {
-	http.HandleFunc("/users", handleUser)
+func main() {
+	http.HandleFunc("/users", authMiddleware(loggerMiddleWare(handleUser)))
 	if err := http.ListenAndServe(":5555", nil); err != nil {
 		log.Fatal(err)
+	}
+}
+
+func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userId := r.Header.Get("x-userid")
+		if userId == "" {
+			log.Printf("userid is empty")
+		}
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, "userid", userId)
+		r = r.WithContext(ctx)
+		next(w, r)
+	}
+}
+
+func loggerMiddleWare(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idFromCx := r.Context().Value("userid")
+		userId, ok := idFromCx.(string)
+		if !ok {
+			log.Printf("userid is empty")
+		}
+		log.Println(r.URL.Path, userId)
+		next(w, r)
 	}
 }
 func handleUser(w http.ResponseWriter, r *http.Request) {
